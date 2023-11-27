@@ -1,0 +1,28 @@
+module Impl.Graph
+
+open FStar.List
+
+type node (n:Type) (es:list edge) =
+  | Cons: value:n -> edges:es
+ 
+type edge (e:Type) (source destination:node (edge e)) =
+  | Cons: value: e -> src:source -> dst:destination
+ 
+type graph (#i #e:Type) (n:node i (edge e n)) =
+  | Cons: nodes:list n
+
+let rec neighbors (n:node a (edge b n)) (neighbor:node a (edge b n)) : bool
+ = let value edges = n in
+    match edges with
+    | [] -> false
+    | e :: remaining_edges ->
+      let value src dst = e in
+      if dst = neighbor then true
+      else neighbors (node value remaining_edges) neighbor
+     
+let rec neighbors_proof (n:node a (edge a n)) (neighbor:node a (edge a n))
+  : Lemma (ensures 
+      (neighbors n neighbor == (exists (i:nat{i < length n.edges}). (get i n.edges).dst = neighbor))
+      /\
+      (neighbors n neighbor == (forall (i:nat{i < length n.edges}). (get i n.edges).dst != neighbor))
+    ) = ()

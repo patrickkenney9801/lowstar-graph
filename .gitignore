@@ -1,0 +1,8 @@
+.vscode
+build
+tmp
+
+fstar/dist
+fstar/hints
+fstar/obj
+fstar/specs
