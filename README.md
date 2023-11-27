@@ -8,3 +8,5 @@ krml fstar/obj/out.krml -tmpdir fstar/obj -skip-linking
 ```
 
 How to build libraries, how to build a simple executable with a main function
+
+Cannot be asserted out of the box `assert (max l > hd ==> (hd < max l));`.

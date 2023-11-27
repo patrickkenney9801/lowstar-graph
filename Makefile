@@ -67,7 +67,7 @@ c:
 	@krml fstar/obj/*.krml -dc -verbose -tmpdir fstar/dist -verify \
 	  -warn-error @4@5@18 \
 		-fparentheses \
-		-bundle Impl.Graph.Max= \
+		-bundle Impl.Graph.MaxGeneral= \
 	  -bundle 'LowStar.*,Prims' \
 		-bundle Spec.*[rename=Graph] \
 		-minimal \
