@@ -5,6 +5,7 @@ open FStar.Tactics.Typeclasses
 open FStar.Order
 open FStar.OrdSet
 module U64 = FStar.UInt64
+module U32 = FStar.UInt32
 
 let rec get (#a:Type) (i:nat) (l:list a {i < length l}) : a
   = let hd :: tl = l in
@@ -53,3 +54,9 @@ let u64_cmp (x y:U64.t) : Tot bool
 
 let max_uint64 (l:list U64.t {length l > 0}) : Tot U64.t
   = max u64_cmp l
+
+let u32_cmp (x y:U32.t) : Tot bool
+  = U32.gte x y
+
+let max_uint32 (l:list U32.t {length l > 0}) : Tot U32.t
+  = max u32_cmp l

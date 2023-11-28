@@ -1,19 +1,30 @@
-module Impl.Graph.MaxGeneral
+module Impl.Graph.MaxGeneralTypeClass
 
 open FStar.List
 open FStar.Tactics.Typeclasses
-open FStar.Order
+module O = FStar.Order
 open FStar.Class.TotalOrder.Raw
+module U64 = FStar.UInt64
+
+// WARNING: UNPROVEN since x < y =!=> y < x given (#a:Type) {|totalorder a|} (x y:a)
 
 instance _ : totalorder nat = {
   compare = Order.compare_int;
 }
 
+let add_one (i:int) : int = i + 1
+let add_one_pf (i:int) : Lemma (ensures add_one i = i + 1) = ()
+let rec get (#a:Type) (i:nat) (l:list a {i < length l}) : a
+  = let hd :: tl = l in if i = 0 then hd else get (i - 1) tl
+let rec get_counter (#a:Type) (i:nat) (desired:nat {i <= desired}) (l:list a {desired - i < length l}) : Tot a (decreases (desired - i))
+  = let hd :: tl = l in if i = desired then hd else get_counter (i + 1) desired tl
+
+(*
 let rec get (#a:Type) (i:nat) (l:list a {i < length l}) : a
   = let hd :: tl = l in
     if i = 0 then hd
     else get (i - 1) tl
-
+*)
 let get_nonempty_tail (#a:Type) (l:list a {length l > 0}) : list a
   = match l with
   | [x] -> [x]
@@ -42,11 +53,20 @@ let rec max_greater (#a:Type) {|totalorder a|} (l:list a {length l > 0})
       assert (max l > max tl \/ max l == max tl);
       assert (max l > hd \/ max l == hd);
       max_greater tl
+
+let rec max_greater (#a:Type) {|totalorder a|} (l:list a {length l > 0})
+  : Lemma (ensures (max l == get 0 l) \/ (max l > get 0 l))
+  = match l with
+    | [x] -> belongs l
+    | hd :: tl ->
+      assert (max l > max tl \/ max l == max tl);
+      assert (max l > hd \/ max l == hd);
+      max_greater tl
 *)
 
 
 
-
+(*
 let rec max_strictly_inc (#a:Type) {|totalorder a|} (l:list a {length l > 0})
   : Lemma (
       ensures (
@@ -168,7 +188,7 @@ let rec max_step (#a:Type) {|totalorder a|} (l:list a {length l > 0})
       //assert (max l > get 0 l \/ max l == get 0 l);
       max_strictly_inc tl;
       max_step tl
-
+*)
 (*
 let rec maximum (#a:Type) {|totalorder a|} (l:list a {length l > 0})
   : Lemma (
@@ -187,3 +207,19 @@ let rec maximum (#a:Type) {|totalorder a|} (l:list a {length l > 0})
       max_strictly_inc tl;
       maximum tl
 *)
+
+
+let max_nat (l:list nat {length l > 0}) : Tot nat
+  = max l
+
+let u64_cmp (x y:U64.t) : O.order
+  = if U64.gt x y then O.Gt
+    else if U64.lt x y then O.Lt
+    else O.Eq
+
+instance _ : totalorder U64.t = {
+  compare = u64_cmp;
+}
+
+let max_u64 (l:list U64.t {length l > 0}) : Tot U64.t
+  = max l
